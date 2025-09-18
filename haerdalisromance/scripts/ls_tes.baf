@@ -1,0 +1,14 @@
+IF
+    NumTimesTalkedTo(0)
+THEN
+  RESPONSE #100
+    MoveToObject("HaerDalis")
+    Dialogue(Player1)
+END
+
+IF
+    GlobalGT("LS_TesActive","GLOBAL",3)
+THEN
+  RESPONSE #100
+    EscapeAreaDestroy(2)
+END

@@ -1,0 +1,196 @@
+// --------------------------------------------
+// Mod setup
+// --------------------------------------------
+// Basics
+BACKUP ~haerdalisromance/backup~
+AUTHOR ~kae@spellholdstudios.net~
+VERSION ~v2.2~
+README ~haerdalisromance/translations/%LANGUAGE%/haerdalisromance_readme.html~
+
+ALWAYS
+// eet compatibility
+ACTION_IF (GAME_IS ~eet~) BEGIN
+  OUTER_SET bg2_chapter = 12
+END ELSE BEGIN
+  OUTER_SET bg2_chapter = 0
+END
+OUTER_FOR (i=1; i<=10; i=i+1) BEGIN
+  OUTER_SET bg2_chapter = bg2_chapter + 1
+  OUTER_SPRINT name_source ~bg2_chapter_%i%~
+  OUTER_SET EVAL ~%name_source%~ = bg2_chapter
+END
+
+  // Borrowed from Edwin Romance: convert strings to UTF-8 for BGEE/BG2EE
+
+  // setup.tra contains in game texts as well as installation texts
+  // and need to be converted
+  ACTION_DEFINE_ARRAY noconvert BEGIN END
+  ACTION_DEFINE_ARRAY reload BEGIN setup END
+
+  LAF HANDLE_CHARSETS
+    INT_VAR
+      infer_charset = 1
+    STR_VAR
+      tra_path = EVAL ~%MOD_FOLDER%/translations~
+      // charset_table = charsets // Use HANDLE_CHARSETS built-in rule for charset choice
+      noconvert_array = noconvert
+      reload_array = reload
+  END
+END
+
+// Translations
+AUTO_TRA ~haerdalisromance/translations/%s~
+
+LANGUAGE ~English~
+         ~English~
+         ~haerdalisromance/translations/english/setup.tra~
+
+// --------------------------------------------
+// haerdalisromance NPC Mod v2.0
+// --------------------------------------------
+// Component setup
+BEGIN @0
+
+// Adds custom IsValidForPartyDialogue state used throughout haerdalisromance
+APPEND ~STATE.IDS~ // adds custom IsValidForPartyDialogue state
+  ~0x80101FEF CD_STATE_NOTVALID~
+  UNLESS ~CD_STATE_NOTVALID~
+  
+// Fixing Imoen's dialogue file
+ACTION_IF FILE_EXISTS_IN_GAME ~mel01.cre~ THEN BEGIN
+  COPY_EXISTING ~interdia.2da~ ~override~
+    SET_2DA_ENTRY 17 1 2 ~BIMOEN2~ // fixes ToB version
+    BUT_ONLY_IF_IT_CHANGES
+END ELSE BEGIN
+  APPEND ~interdia.2da~ ~IMOEN       BIMOEN2~ // fixes SoA version
+    UNLESS ~BIMOEN2~
+END
+
+// Fixpack ids fixes
+INCLUDE ~haerdalisromance/lib/ids.tph~
+INCLUDE ~haerdalisromance/lib/times.tph~
+CLEAR_IDS_MAP
+
+// changes
+COPY_EXISTING ~player1.dlg~ ~override~
+  DECOMPILE_DLG_TO_D
+    REPLACE_TEXTUALLY ~IsValidForPartyDialogue("HAERDALIS")
+!IsValidForPartyDialogue("IMOEN2")
+!IsValidForPartyDialogue("JAHEIRA")
+!IsValidForPartyDialogue("VICONIA")
+!IsValidForPartyDialogue("AERIE")
+!IsValidForPartyDialogue("ANOMEN")
+!IsValidForPartyDialogue("EDWIN")
+!IsValidForPartyDialogue("VALYGAR")
+!IsValidForPartyDialogue("KELDORN")
+!IsValidForPartyDialogue("KORGAN")
+!IsValidForPartyDialogue("JAN")
+!IsValidForPartyDialogue("NALIA")
+!IsValidForPartyDialogue("MAZZY")~
+    ~IsValidForPartyDialogue("HAERDALIS")
+!Global("LS_HaerDalisRomanceActive","GLOBAL",1)
+!IsValidForPartyDialogue("IMOEN2")
+!IsValidForPartyDialogue("JAHEIRA")
+!IsValidForPartyDialogue("VICONIA")
+!IsValidForPartyDialogue("AERIE")
+!IsValidForPartyDialogue("ANOMEN")
+!IsValidForPartyDialogue("EDWIN")
+!IsValidForPartyDialogue("VALYGAR")
+!IsValidForPartyDialogue("KELDORN")
+!IsValidForPartyDialogue("KORGAN")
+!IsValidForPartyDialogue("JAN")
+!IsValidForPartyDialogue("NALIA")
+!IsValidForPartyDialogue("MAZZY")~
+  COMPILE_D_TO_DLG
+BUT_ONLY_IF_IT_CHANGES
+
+/*
+COPY_EXISTING ~ar2900.bcs~ ~override~
+  DECOMPILE_BCS_TO_BAF
+    REPLACE_TEXTUALLY ~IF
+    Global("TearDoor","GLOBAL",5)~
+    ~IF
+    Global("TearDoor","GLOBAL",5)
+    OR(2)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",3)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",0)~
+  COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES    */
+
+// Compiling dialogue...
+COMPILE ~haerdalisromance/dialogue/lovetalks.d~
+COMPILE ~haerdalisromance/dialogue/interjections.d~
+COMPILE ~haerdalisromance/dialogue/pid.d~
+COMPILE ~haerdalisromance/dialogue/banter.d~
+COMPILE ~haerdalisromance/dialogue/book.d~
+COMPILE ~haerdalisromance/dialogue/tobbanter.d~
+COMPILE ~haerdalisromance/dialogue/tobinns.d~
+COMPILE ~haerdalisromance/dialogue/toblts.d~
+COMPILE ~haerdalisromance/dialogue/wraith.d~
+COMPILE ~haerdalisromance/dialogue/join.d~
+COMPILE ~haerdalisromance/dialogue/tobpid.d~
+
+// Compiling scripts...
+EXTEND_BOTTOM ~haerdali.bcs~ ~haerdalisromance/scripts/haerdali.baf~
+EXTEND_BOTTOM ~haerdad.bcs~  ~haerdalisromance/scripts/haerdad.baf~
+/*EXTEND_TOP    ~ar2900.bcs~   ~haerdalisromance/scripts/ar2900.baf~ */
+EXTEND_TOP    ~ar6200.bcs~   ~haerdalisromance/scripts/ar6200.baf~
+EXTEND_BOTTOM ~jaheira.bcs~  ~haerdalisromance/scripts/jaheira.baf~
+EXTEND_BOTTOM ~haer25.bcs~   ~haerdalisromance/scripts/haer25.baf~
+EXTEND_BOTTOM ~haerdad.bcs~  ~haerdalisromance/scripts/haer25d.baf~
+EXTEND_BOTTOM ~sarev25.bcs~  ~haerdalisromance/scripts/sarev25.baf~
+EXTEND_BOTTOM ~cut218g.bcs~  ~haerdalisromance/scripts/ls_hwr2.baf~
+COMPILE ~haerdalisromance/scripts/ls_tes.baf~
+COMPILE ~haerdalisromance/scripts/ls_hwra.baf~
+
+
+// Creatures
+COPY_EXISTING ~c6catti.cre~ ~override/ls_sal.cre~
+  SAY NAME1 @1
+  SAY NAME2 @1
+  WRITE_EVALUATED_ASCII DIALOG          ~LS_LYN25~ #8
+  WRITE_EVALUATED_ASCII DEATHVAR        ~ls_sal~ #32
+  WRITE_EVALUATED_ASCII SCRIPT_OVERRIDE ~ls_sal~ #8
+
+COPY_EXISTING ~c6natas.cre~ ~override/ls_tes.cre~
+  SAY NAME1 @2
+  SAY NAME2 @2
+  WRITE_EVALUATED_ASCII DIALOG          ~lstes25~ #8
+  WRITE_EVALUATED_ASCII DEATHVAR        ~ls_tes~ #32
+  WRITE_EVALUATED_ASCII SCRIPT_OVERRIDE ~ls_tes~ #8
+
+
+// Conversable item
+COPY ~haerdalisromance/items/ls_book.itm~ ~override/ls_book.itm~
+  SAY NAME1 @3
+  SAY NAME2 @3
+  SAY DESC @4
+
+APPEND ~itemdial.2da~ ~LS_BOOK 5689 LS_BOOK~
+   UNLESS ~LS_BOOK~
+   
+
+// Epilogues
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer1.2da~
+REPLACE ~99999~ @5
+
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer2.2da~
+REPLACE ~99999~ @6
+
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer3.2da~
+REPLACE ~99999~ @7
+
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer4.2da~
+REPLACE ~99999~ @8
+
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer5.2da~
+REPLACE ~99999~ @9
+
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer6.2da~
+REPLACE ~99999~ @10
+
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer7.2da~
+REPLACE ~99999~ @11
+
+COPY ~haerdalisromance/epilogues/ls_haer.2da~ ~override/ls_haer8.2da~
+REPLACE ~99999~ @12

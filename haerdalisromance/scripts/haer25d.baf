@@ -1,0 +1,54 @@
+// Saradush inn
+IF
+    OR(2)
+      Global("LS_HaerDalisRomanceActive","GLOBAL",1)
+      Global("LS_HaerDalisRomanceActive","GLOBAL",2)
+    Global("LS_HaerDalisToBSaradush","GLOBAL",0)
+    AreaCheck("AR5003")
+    !Dead("HaerDalis")
+    !InMyArea("b!laran")
+THEN
+  RESPONSE #100
+    SetGlobal("LS_HaerDalisToBSaradush","GLOBAL",1)
+    MoveToObject(Player1)
+    Dialogue(Player1)
+END
+
+
+// Amkethran inn: cheating pt. 2
+IF
+    OR(2)
+      Global("LS_HaerDalisRomanceActive","GLOBAL",1)
+      Global("LS_HaerDalisRomanceActive","GLOBAL",2)
+    Global("LS_HaerDalisToBAmkethran","GLOBAL",0)
+    OR(23)
+      Global("AnomenRomanceActive","GLOBAL",2)
+      Global("B!GavRA","GLOBAL",2)
+      Global("EdwinRomanceActive", "GLOBAL",2)
+      Global("J#KelseyRomanceActive","GLOBAL",2)
+      Global("TsujathaRomanceActive","GLOBAL",2)
+      Global("ADAngelRomanceActive","GLOBAL",2)
+      GlobalGT("SolaTalk","GLOBAL",14)
+      Global("P#KivanRomanceActive","GLOBAL",2) 
+      Global("O#XanRomanceActive","GLOBAL",2) 
+      Global("B!KeldornRA","GLOBAL",2)
+      Global("c-aranrom","GLOBAL",2)
+      Global("H#ValygarRomanceActive","GLOBAL",2)
+      Global("ls-laskromance","GLOBAL",2)
+      Global("rh#AdrianRomanceActive","GLOBAL",2)
+      Global("LK#ArathRomanceActive","GLOBAL",2)
+      Global("T1DarRomanceActive","GLOBAL",2)
+      Global("FHFarenRomanceActive","GLOBAL",2)
+      Global("SK#NehtRomanceActive","GLOBAL",2)
+      Global("C#AjantisRomanceActive","GLOBAL",2)
+      Global("ChloeRomanceActiveCR","GLOBAL",2)
+      Global("K#SarahRomanceActive","GLOBAL",2)
+      Global("SimeRomanceActive","GLOBAL",2)
+      Global("LS#SarevokRomanceActive","GLOBAL",2)
+    AreaCheck("AR5501")
+    !Dead("HaerDalis")
+THEN
+  RESPONSE #100
+    CreateCreatureObjectOffset("ls_tes",Player1,[5.5])
+    SetGlobal("LS_HaerDalisToBAmkethran","GLOBAL",1)
+END

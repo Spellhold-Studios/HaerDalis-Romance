@@ -1,0 +1,119 @@
+// Begin trigger template
+
+COPY_EXISTING ~AR5202.are~ ~override~ // copy over the area you want to edit
+
+// Read a bunch of offsets:  These tell the game where to start looking for
+// the various features of the area.  I named them with the first four letters
+// of their name in Near Infinity. Notice that the trigger feature and the vertice
+// feature include the number value as well as the offset value.  These two features
+// will be the ones we are editing.
+
+  READ_SHORT    0x5c ~trigger_off~         // One thing that took me a while to figure out
+  READ_SHORT    0x5a ~trigger_num~    // is that in a .tp2 file "0x10" means the number
+                                                                          // 10 in hexadecimal (or 16 in regular numbers)    
+  READ_SHORT    0x7c ~vert_off~
+  READ_SHORT    0x80 ~vert_num~
+  
+  READ_SHORT    0x60 ~spaw_off~
+  READ_SHORT    0x68 ~entr_off~
+  READ_SHORT    0x70 ~cont_off~
+  READ_SHORT    0x74 ~cont_num~
+  READ_SHORT    0x78 ~item_off~
+  READ_SHORT    0x84 ~ambi_off~
+  READ_SHORT    0x88 ~vari_off~
+  READ_SHORT    0xa0 ~bitm_off~
+  READ_SHORT    0xa8 ~door_off~
+  READ_SHORT    0xb0 ~anim_off~
+  READ_SHORT    0xb8 ~tile_off~
+  READ_SHORT    0xbc ~song_off~
+  READ_SHORT    0xc0 ~rest_off~
+  READ_SHORT    0xc4 ~auto_off~
+
+// Ok, time to make our changes.  We want to add a new trigger and we want to add its vertices to
+// the area.  
+
+// Adding the trigger
+
+  WRITE_SHORT     0x5a         trigger_num + 1             //Increases the triggers by one
+  SET  ins_off = ( trigger_off + (0xc4 * trigger_num) )  //Find the spot in the file that's at the end of the triggers
+  INSERT_BYTES  ins_off     0xc4                                    //Adds in a trigger's worth of space at that spot.
+                                                                                               //If we don't add in more space it'll write over other parts
+                                                                                               //of the area
+
+// Move the offsets after the trigger down by the amount of space we added in
+
+  WRITE_SHORT   0x60     spaw_off  + 0xc4
+  WRITE_SHORT   0x68     entr_off  + 0xc4
+  WRITE_SHORT   0x70     cont_off  + 0xc4
+  WRITE_SHORT   0x78     item_off  + 0xc4
+  WRITE_SHORT   0x84     ambi_off  + 0xc4
+  WRITE_SHORT   0xb8     tile_off  + 0xc4
+
+// The next offset is the vertice offset.  This is the other place that we'll edit things.
+
+// First, we find out how many of the vertices in the area are trigger vertices.
+
+  SET ~total_tv_num~ = 0
+  
+  FOR (i = 0; i < trigger_num; i += 1) BEGIN                                 // Go through all the triggers
+    READ_SHORT   trigger_off + (i * 0xc4) + 0x2a  ~tv_num~    // Read how many triggers they have
+    SET ~total_tv_num~ = total_tv_num + tv_num                       // Add them all up
+  END  
+     
+  SET ~more_v~ = 4                                               // This is how many vertices you want to add.  
+                                                                                  //   I added four.
+  WRITE_SHORT   0x7c     vert_off  + 0xc4        // This moves the vertice offset by the amount 
+                                                                                  //   of space you added for the trigger
+  WRITE_SHORT   0x80     vert_num  + more_v        // And adds in your new vertices
+  
+  SET ~ins_v_off~ = (vert_off + 0xc4) + total_tv_num * 4    // This figures out where to add in space for
+                                                                                                    //   the new vertices.  It's at the end of all the
+                                                                                                    //   other trigger vertices. 
+  INSERT_BYTES ins_v_off      ~more_v~ * 4                    // This adds in four vertices worth of space.
+   
+// Other things besides containers use vertices; doors and containers.  We need to shift where they are 
+// looking for their vertices.  The area I am editting doesn't have any doors, so it just shifts the
+// container vertices.
+  
+  FOR (i = 0; i < cont_num; i += 1) BEGIN                                                            // Go through all the containers.
+    READ_SHORT  (%cont_off% + 0xc4) + (i * 0xc0) + 0x50    ~cv_num~        //Find out where it looks for its vertices.
+    WRITE_SHORT (%cont_off% + 0xc4) + (i * 0xc0) + 0x50       %cv_num% + %more_v% //And change it by the number of vertices
+  END                                           //we added.    
+   
+// Now we can continue moving the offsets of all the area features that come after vertices.  This time
+// we move them by the space we made for the trigger plus the space we made for the vertices.
+
+  WRITE_SHORT   0xa8     %door_off%      + 0xc4 + 4 * %more_v%
+  WRITE_SHORT   0x88     %vari_off%     + 0xc4 + 4 * %more_v%  
+  WRITE_SHORT   0xa0     %bitm_off%     + 0xc4 + 4 * %more_v%  
+  WRITE_SHORT   0xb0     %anim_off%     + 0xc4 + 4 * %more_v%  
+  WRITE_SHORT   0xbc     %song_off%     + 0xc4 + 4 * %more_v%  
+  WRITE_SHORT   0xc0     %rest_off%     + 0xc4 + 4 * %more_v%  
+  WRITE_SHORT   0xc4     %auto_off%     + 0xc4 + 4 * %more_v%  
+  
+// Now we can start writing the instructions for making our trigger into the black space we made.
+    
+  WRITE_ASCII %ins_off%        ~Altar~                                         // Name of the trigger
+  WRITE_SHORT %ins_off% + 0x20     1                                     // What kind of trigger it is
+  WRITE_SHORT %ins_off% + 0x22    821                                // The smallest x value of all the vertices
+  WRITE_SHORT %ins_off% + 0x24    839                                // The smallest y value of all the vertices
+  WRITE_SHORT %ins_off% + 0x26    938                                // The biggest x value of all the vertices
+  WRITE_SHORT %ins_off% + 0x28     924                                // The biggest y value of all the vertices
+  WRITE_SHORT %ins_off% + 0x2a    %more_v%                 // # vertices for this trigger
+  WRITE_SHORT %ins_off% + 0x2c    %total_tv_num%        // where to look for the vertices
+  WRITE_SHORT %ins_off% + 0x34  8                                        // what the tooltip looks like
+  WRITE_ASCII %ins_off% + 0x7c    ~ITTOBR~                           // the name of the script associated with your trigger
+  
+// And now we write in what our vertices are into the blank space we made for them.  Remember to do it
+// clockwise.
+
+  WRITE_SHORT %ins_v_off%   + 0x00    857        // 1st x coord
+  WRITE_SHORT %ins_v_off%   + 0x02    924        // 1st y coord
+  WRITE_SHORT %ins_v_off%   + 0x04    821        // 2st x coord
+  WRITE_SHORT %ins_v_off%   + 0x06    903        // 2st y coord
+  WRITE_SHORT %ins_v_off%   + 0x08    907            // 3rd x coord
+  WRITE_SHORT %ins_v_off%   + 0x0a    839        // 3rd y coord
+  WRITE_SHORT %ins_v_off%   + 0x0c    938          // 4th x coord
+  WRITE_SHORT %ins_v_off%   + 0x0e    862        // 4th y coord
+
+// That's the end of the template!

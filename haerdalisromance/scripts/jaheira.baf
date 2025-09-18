@@ -1,0 +1,37 @@
+// ---------------
+// Jaheira comment
+// ---------------
+
+IF
+    Global("LS_HaerdalisRomanceActive","GLOBAL",1)
+    Global("LS_HaerDalisSex","GLOBAL",2)
+    Global("LS_Jaheira","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("LS_Jaheira","GLOBAL",1)
+    RealSetGlobalTimer("LS_Jaheira_timer","GLOBAL",1800)
+END
+
+IF
+    RealGlobalTimerExpired("LS_Jaheira_timer","GLOBAL")
+    Global("LS_HaerdalisRomanceActive","GLOBAL",1)
+    Global("LS_Jaheira","GLOBAL",1)
+THEN
+  RESPONSE #100
+    SetGlobal("LS_Jaheira","GLOBAL",2)
+END
+
+IF
+    InParty(Myself)
+    See(Player1)
+    !StateCheck("Jaheira",CD_STATE_NOTVALID)
+    !StateCheck(Player1,CD_STATE_NOTVALID)
+    CombatCounter(0)
+    !See([ENEMY])
+    Global("LS_Jaheira","GLOBAL",2)
+    Global("LS_HaerdalisRomanceActive","GLOBAL",1)
+THEN
+  RESPONSE #100
+    MoveToObject(Player1)
+    Dialogue(Player1)
+END

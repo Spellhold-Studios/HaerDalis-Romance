@@ -1,0 +1,32 @@
+IF
+  Global("TearDoor","GLOBAL",5)
+  Global("LS_HaerDalisRomanceActive","GLOBAL",1)
+  Global("LS_Haer_Hell","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("LS_Haer_Hell","GLOBAL",1)
+END
+
+IF
+  Global("TearDoor","GLOBAL",5)
+  Global("LS_HaerDalisRomanceActive","GLOBAL",1)
+  Global("LS_Haer_Hell","GLOBAL",2)
+THEN
+  RESPONSE #100
+    SetGlobal("LS_Haer_Hell","GLOBAL",3)
+    CreateCreature("HELLSPY",[2014.400],0)
+    CreateCreatureImpassable("HELLSPY2",[1850.423],0)
+    CreateCreatureImpassable("HELLSPY3",[1865.300],0)
+    CreateCreatureImpassable("HELLSPY4",[2016.173],0)
+    CreateCreatureImpassable("HELLSPY5",[2158.313],0)
+    CreateCreatureImpassable("HELLSPY6",[2175.442],0)
+    ApplySpell(Myself,REMOVE_NON_PERMANENT_DEATH)
+    ApplySpell(Player2,REMOVE_NON_PERMANENT_DEATH)
+    ApplySpell(Player3,REMOVE_NON_PERMANENT_DEATH)
+    ApplySpell(Player4,REMOVE_NON_PERMANENT_DEATH)
+    ApplySpell(Player5,REMOVE_NON_PERMANENT_DEATH)
+    ApplySpell(Player6,REMOVE_NON_PERMANENT_DEATH)
+    Wait(1)
+    StartCutSceneMode()
+    StartCutScene("Cut85a")
+END

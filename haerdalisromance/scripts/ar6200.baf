@@ -1,0 +1,116 @@
+// ---------------------------------------------
+// Haer'Dalis Romance Epilogues
+// ---------------------------------------------
+// PC does not ascend, love, travel and PC has the book
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("PlayerChoseEssence","GLOBAL",0)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",2) 
+    GlobalGT("LS_HaerDalisTravels","GLOBAL",0) 
+    PartyHasItem("ls_book")
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer1")
+END
+
+// PC does not ascend, love, settling down and PC has book
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("LS_HaerDalisRomanceActive","GLOBAL",2) 
+    Global("PlayerChoseEssence","GLOBAL",0)
+    Global("LS_HaerDalisTravels","GLOBAL",0)
+    PartyHasItem("ls_book")
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer2")
+END
+
+// PC does not ascend, love, travel and PC destroyed the book
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("LS_HaerDalisRomanceActive","GLOBAL",2) 
+    Global("PlayerChoseEssence","GLOBAL",0)
+    GlobalGT("LS_HaerDalisTravels","GLOBAL",0) 
+    !PartyHasItem("ls_book")
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer3")
+END
+
+// PC does not ascend, love, settling down and PC destroyed the book
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("PlayerChoseEssence","GLOBAL",0)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",2) 
+    Global("LS_HaerDalisTravels","GLOBAL",0) 
+    !PartyHasItem("ls_book")
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer4")
+END
+
+// PC does not ascend, romance over and PC has book
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("PlayerChoseEssence","GLOBAL",0)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",3) 
+    Global("LS_PChasbook","GLOBAL",1)
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer5")
+END
+
+// PC does not ascend, romance over and PC destroyed book
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("PlayerChoseEssence","GLOBAL",0)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",3)
+    !PartyHasItem("ls_book")
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer6")
+END
+
+// PC ascends, committed romance
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("PlayerChoseEssence","GLOBAL",1)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",2)
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer7")
+END
+
+// PC ascends, romance over
+IF
+    Global("StartEndBios","AR6200",1)
+    InParty("HaerDalis")
+    Global("PlayerChoseEssence","GLOBAL",1)
+    Global("LS_HaerDalisRomanceActive","GLOBAL",3)
+    Global("HaerdalisBio","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("HaerdalisBio","GLOBAL",1)
+    TextScreen("ls_haer8")
+END
